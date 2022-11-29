@@ -1,0 +1,121 @@
+# Standard data science imports
+import numpy as np
+import pandas as pd
+from pandas import Series, DataFrame
+
+# Visualization libraries
+import seaborn as sns
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+# Statistics packages
+import pylab
+from pylab import rcParams
+import statsmodels.api as sm
+import statistics
+from scipy import stats
+
+# Scikit-learn
+import sklearn
+from sklearn import preprocessing
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+from sklearn.metrics import classification_report
+
+# Import chisquare from SciPy.stats
+from scipy.stats import chisquare
+from scipy.stats import chi2_contingency
+from sklearn.datasets import make_classification
+from matplotlib import pyplot as plt
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
+import pandas as pd
+import statsmodels.api as sm
+
+# Load data set into Pandas dataframe
+dataset = pd.read_csv('/Desktop/churn_clean.csv')
+
+dataset
+
+dataset.info()
+
+print(dataset['Churn'].value_counts())
+sns.countplot(x='Churn', data=dataset, palette='hls')
+plt.show()
+
+# will replace "Yes" value in dataframe with 1
+dataset['churn_dummy'] = [1 if v == 'Yes' else 0 for v in dataset['Churn']]
+
+#Print Dataframe
+dataset.describe()
+
+dataset.groupby('Churn').mean().round(2).T
+
+dataset.to_csv(r'/Desktop/dataset.csv')
+
+knn_df = dataset[['Income', 'Tenure', 'Bandwidth_GB_Year', 'churn_dummy']]
+
+knn_df.describe()
+
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+
+X = knn_df.iloc[:, 1:-1].values
+y = knn_df.iloc[:, -1].values
+
+X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size = 0.2, random_state=42)
+
+knn = KNeighborsClassifier(n_neighbors=6)
+
+knn.fit(X_train, y_train)
+
+print(knn.predict(X_test))
+
+print(knn.score(X_test, y_test))
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size = 0.2, random_state=42)
+
+neighbors = np.arange(1, 9)
+train_accuracy = np.empty(len(neighbors))
+test_accuracy = np.empty(len(neighbors))
+
+for i, k in enumerate(neighbors):
+    knn = KNeighborsClassifier(n_neighbors=k)
+    knn.fit(X_train, y_train)
+    train_accuracy[i] = knn.score(X_train, y_train)
+    test_accuracy[i] = knn.score(X_test, y_test)
+    
+plt.plot(neighbors, test_accuracy, label = 'Test Accuracy')
+plt.plot(neighbors, train_accuracy, label = 'Training Accuracy')
+
+plt.legend()
+plt.xlabel('n_neighbors')
+plt.ylabel('Accuracy')
+plt.show()
+
+from sklearn.metrics import roc_curve
+pred_prob = knn.predict_proba(X_test)
+fpr2, tpr2, thresh2 = roc_curve(y_test, pred_prob[:,1], pos_label=1)
+
+random_probs = [0 for i in range(len(y_test))]
+p_fpr, p_tpr, _ = roc_curve(y_test, random_probs, pos_label=1)
+from sklearn.metrics import roc_auc_score
+
+auc_score = roc_auc_score(y_test, pred_prob[:,1])
+
+print(auc_score)
+
+knn_df.to_csv(r'/Desktop/knn_df.csv')
+
+df = pd.DataFrame(X_test, y_test)
+df.to_csv(r'/Desktop/test.csv')
+df2 = pd.DataFrame(X_train, y_train)
+df2.to_csv(r'/Desktop/train.csv')
+print(train_test_split(X_test))
